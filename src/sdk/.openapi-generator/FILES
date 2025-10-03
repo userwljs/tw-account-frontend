@@ -1,0 +1,17 @@
+.gitignore
+.npmignore
+api.ts
+base.ts
+common.ts
+configuration.ts
+docs/AccountInfo.md
+docs/BodyEmailSendVerificationCodeEmailSendVerificationCodePost.md
+docs/BodyRegisterAccountAccountRegisterPost.md
+docs/DefaultApi.md
+docs/EmailDomainRestrictionInfo.md
+docs/HTTPValidationError.md
+docs/Token.md
+docs/ValidationError.md
+docs/ValidationErrorLocInner.md
+git_push.sh
+index.ts

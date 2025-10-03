@@ -1,11 +1,9 @@
 <script setup lang="ts"></script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <main class="bg-gray-50 dark:bg-gray-950 min-h-screen min-w-screen">
+    <router-view />
+  </main>
 </template>
 
 <style scoped></style>
