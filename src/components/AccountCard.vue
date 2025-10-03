@@ -69,7 +69,12 @@ enum EmailValidationError {
 function validateEmail(): Array<EmailValidationError> {
   const result: Array<EmailValidationError> = []
 
-  if (isEmailFormatWrong()) result.push(EmailValidationError.FormatError)
+  if (email.value.length > 129) result.push(EmailValidationError.TooLong)
+
+  if (isEmailFormatWrong()) {
+    result.push(EmailValidationError.FormatError)
+    return result
+  }
 
   if (restrictEmailDomain.value !== undefined && restrictedEmailDomains.value !== undefined && restrictEmailDomain.value !== "no") {
     const domain = email.value.split('@')[1]
@@ -80,9 +85,6 @@ function validateEmail(): Array<EmailValidationError> {
       if (restrictedEmailDomains.value.includes(domain as string)) result.push(EmailValidationError.DomainNotAllowed)
     }
   }
-
-  if (email.value.length > 129) result.push(EmailValidationError.TooLong)
-
   return result
 }
 
@@ -118,13 +120,19 @@ function isEmailFormatWrong(): boolean {
     <div class="mb-4">
       <input v-model="email" type="email" placeholder="邮箱" :disabled="sendingCode"
         class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+
+      <div v-if="restrictEmailDomain === 'whitelist'"
+        class="mt-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-md">
+        <i class="i-tabler-info-circle mr-1"></i>
+        仅允许以下域名的邮箱：{{ (restrictedEmailDomains as Array<string>).join("、") }}
+      </div>
+
+      <div v-if="restrictEmailDomain === 'blacklist'"
+        class="mt-2 text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-md">
+        <i class="i-tabler-alert-triangle mr-1"></i>
+        不允许以下域名的邮箱：{{ (restrictedEmailDomains as Array<string>).join("、") }}
+      </div>
     </div>
-
-    <p v-if="restrictEmailDomain !== undefined && restrictEmailDomain === 'whitelist'">仅允许以下域名的邮箱：{{
-      (restrictedEmailDomains as Array<string>).join("、") }}</p>
-
-    <p v-if="restrictEmailDomain !== undefined && restrictEmailDomain === 'blacklist'">不允许以下域名的邮箱：{{
-      (restrictedEmailDomains as Array<string>).join("、") }}</p>
 
     <!-- 验证码输入框 + 发送按钮 -->
     <div class="mb-4 flex items-center space-x-2">
