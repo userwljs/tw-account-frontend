@@ -141,7 +141,8 @@ const loginOrRegisterDisabled = computed(() => { return validateEmail().length !
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md max-w-md mx-auto mt-10">
+  <div
+    class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg max-w-md mx-auto mt-10 transition-all duration-300 hover:shadow-xl">
     <h2 class="text-2xl font-bold text-center text-gray-700 dark:text-gray-200 mb-6">{{ props.register ? '注册' : '登录' }}
     </h2>
 
