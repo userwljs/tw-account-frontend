@@ -1,34 +1,44 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { api } from '@/main';
 import type { EmailDomainRestrictionInfoRestrictEmailDomainsEnum } from '@/../sdk';
 import { checkAndDealError } from '@/lib';
+import Swal from 'sweetalert2';
+import router from '@/router';
 
 const props = defineProps<{
   register: boolean
 }>()
 
+const unmounted = ref(false)
 const countdown = ref(0)
 const countingDown = ref(false)
 const sendingCode = ref(false)
 const code = ref("")
 const email = ref("")
-const rememberMe = ref(false)
 const restrictEmailDomain = ref<EmailDomainRestrictionInfoRestrictEmailDomainsEnum | undefined>(undefined)
 const restrictedEmailDomains = ref<Array<string> | undefined>(undefined)
+const registeringOrLoggingIn = ref(false)
 
 let timer: number | undefined = undefined
 
-onMounted(async () => {
-  const restrictionInfo = (await api.emailDomainRestrictionInfoEmailDomainRestrictionInfoGet()).data
-  restrictEmailDomain.value = restrictionInfo.restrict_email_domains
-  restrictedEmailDomains.value = restrictionInfo.restricted_email_domains
-})
-
-async function sendCode() {
-  if (countingDown.value || sendingCode.value || validateEmail().length !== 0) {
+async function getDomainRestrictionInfo() {
+  if (unmounted.value === undefined || unmounted.value === true || restrictEmailDomain.value !== undefined || restrictedEmailDomains.value !== undefined) return
+  const response = (await api.emailDomainRestrictionInfoEmailDomainRestrictionInfoGet().catch(error => { return error }))
+  if (response.status !== 200) {
+    setTimeout(getDomainRestrictionInfo, 1000)
     return
   }
+  restrictEmailDomain.value = response.data.restrict_email_domains
+  restrictedEmailDomains.value = response.data.restricted_email_domains
+}
+
+onMounted(getDomainRestrictionInfo)
+
+onUnmounted(() => { unmounted.value = true })
+
+async function sendCode() {
+  if (sendCodeDisabled.value) return
 
   sendingCode.value = true
 
@@ -52,8 +62,24 @@ async function sendCode() {
   }, 1000)
 }
 
-function loginOrRegister() {
-  // TODO
+async function loginOrRegister() {
+  if (loginOrRegisterDisabled.value) return
+
+  registeringOrLoggingIn.value = true
+  if (props.register) {
+    const response = await api.registerAccountAccountRegisterPost({ email: email.value, verify_code: code.value }).catch(error => { return error })
+    registeringOrLoggingIn.value = false
+    if (checkAndDealError(response)) return
+    Swal.fire({ title: '成功', text: '注册成功' })
+    router.push('/login')
+  } else {
+    const response = await api.loginAccountLoginPost(email.value, code.value).catch(error => { return error })
+    registeringOrLoggingIn.value = false
+    if (checkAndDealError(response)) return
+    Swal.fire({ title: '成功', text: '登录成功' })
+    localStorage.setItem("access_token", response.data.access_token)
+    router.push('/dashboard')
+  }
 }
 
 enum EmailValidationError {
@@ -109,6 +135,9 @@ function isEmailFormatWrong(): boolean {
 
   return false
 }
+
+const sendCodeDisabled = computed(() => { return countingDown.value || sendingCode.value || validateEmail().length !== 0 })
+const loginOrRegisterDisabled = computed(() => { return validateEmail().length !== 0 || code.value.length !== 6 || registeringOrLoggingIn.value })
 </script>
 
 <template>
@@ -164,26 +193,22 @@ function isEmailFormatWrong(): boolean {
 
     <!-- 验证码输入框 + 发送按钮 -->
     <div class="mb-4 flex items-center space-x-2">
-      <input v-model="code" type="text" placeholder="验证码"
+      <input v-model="code" type="text" placeholder="验证码" :disabled="registeringOrLoggingIn"
         class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
-      <button @click="sendCode" :disabled="countingDown || sendingCode" :class="{
-        'bg-gray-400 cursor-not-allowed dark:bg-gray-600 dark:cursor-not-allowed': countingDown || sendingCode || validateEmail().length !== 0,
-        'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700': !(countingDown || sendingCode || validateEmail().length !== 0)
+      <button @click="sendCode" :disabled="sendCodeDisabled" :class="{
+        'bg-gray-400 cursor-not-allowed dark:bg-gray-600 dark:cursor-not-allowed': sendCodeDisabled,
+        'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700': !sendCodeDisabled
       }" class="px-4 py-2 text-white rounded-md transition-colors">
         {{ countingDown ? `${countdown}s` : '发送验证码' }}
       </button>
     </div>
 
-    <!-- 记住我 -->
-    <div class="flex items-center mb-6" v-if="!props.register">
-      <input id="remember" v-model="rememberMe" type="checkbox"
-        class="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-blue-600 dark:checked:border-blue-600" />
-      <label for="remember" class="text-sm text-gray-700 dark:text-gray-300">记住我</label>
-    </div>
-
-    <!-- 登录按钮 -->
-    <button @click="loginOrRegister"
-      class="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
+    <!-- 登录/注册按钮 -->
+    <button @click="loginOrRegister" class="w-full text-white font-medium py-2 px-4 rounded-md transition-colors"
+      :class="{
+        'bg-gray-400 cursor-not-allowed dark:bg-gray-600 dark:cursor-not-allowed': loginOrRegisterDisabled,
+        'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700': !loginOrRegisterDisabled
+      }" :disabled="loginOrRegisterDisabled">
       {{ props.register ? '注册' : '登录' }}
     </button>
 
