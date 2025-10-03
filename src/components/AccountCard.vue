@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import Swal from 'sweetalert2';
 import { api } from '@/main';
 import type { EmailDomainRestrictionInfoRestrictEmailDomainsEnum } from '@/../sdk';
+import { checkAndDealError } from '@/lib';
 
 const props = defineProps<{
   register: boolean
@@ -32,14 +32,13 @@ async function sendCode() {
 
   sendingCode.value = true
 
-  const response = await api.emailSendVerificationCodeEmailSendVerificationCodePost({ email: email.value })
+  const response = await api.emailSendVerificationCodeEmailSendVerificationCodePost({ email: email.value }).catch(error => {
+    return error
+  })
 
   sendingCode.value = false
 
-  if (response.status !== 200) {
-    Swal.fire({ "titleText": "错误", "text": "发生错误", icon: 'error' })
-    return
-  }
+  if (checkAndDealError(response)) return
 
   countingDown.value = true
   countdown.value = 60
