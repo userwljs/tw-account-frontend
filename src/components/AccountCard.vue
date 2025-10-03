@@ -125,13 +125,17 @@ function isEmailFormatWrong(): boolean {
       <div v-if="restrictEmailDomain === 'whitelist'"
         class="mt-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-md">
         <i class="i-tabler-info-circle mr-1"></i>
-        仅允许以下域名的邮箱：{{ (restrictedEmailDomains as Array<string>).join("、") }}
+        <span class="inline-block max-w-[calc(100%-20px)] truncate align-middle">
+          仅允许以下域名的邮箱：{{ (restrictedEmailDomains as Array<string>).join("、") }}
+        </span>
       </div>
 
       <div v-if="restrictEmailDomain === 'blacklist'"
         class="mt-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-md">
         <i class="i-tabler-alert-triangle mr-1"></i>
-        不允许以下域名的邮箱：{{ (restrictedEmailDomains as Array<string>).join("、") }}
+        <span class="inline-block max-w-[calc(100%-20px)] truncate align-middle">
+          不允许以下域名的邮箱：{{ (restrictedEmailDomains as Array<string>).join("、") }}
+        </span>
       </div>
     </div>
 
