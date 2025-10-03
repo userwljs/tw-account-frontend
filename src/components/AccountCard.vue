@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue';
 import Swal from 'sweetalert2';
 import { api } from '@/main';
-import type { EmailDomainRestrictionInfoRestrictEmailDomainsEnum } from '@/sdk';
+import type { EmailDomainRestrictionInfoRestrictEmailDomainsEnum } from '@/../sdk';
 
 const props = defineProps<{
   register: boolean
