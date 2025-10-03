@@ -6,7 +6,7 @@ export enum NavBarSelectedPage {
   Register,
 }
 
-export function checkAndDealError(error): boolean {
+export function checkAndDealError(error: { status: number }): boolean {
   if (error.status === 200) return false
   if (error.status === 429) {
     Swal.fire({ titleText: '错误', text: '请求频率过高，请稍后再试', icon: 'error' })
