@@ -70,13 +70,13 @@ async function loginOrRegister() {
     const response = await api.registerAccountAccountRegisterPost({ email: email.value, verify_code: code.value }).catch(error => { return error })
     registeringOrLoggingIn.value = false
     if (checkAndDealError(response)) return
-    Swal.fire({ title: '成功', text: '注册成功' })
+    Swal.fire({ title: '成功', text: '注册成功', icon: 'success' })
     router.push('/login')
   } else {
     const response = await api.loginAccountLoginPost(email.value, code.value).catch(error => { return error })
     registeringOrLoggingIn.value = false
     if (checkAndDealError(response)) return
-    Swal.fire({ title: '成功', text: '登录成功' })
+    Swal.fire({ title: '成功', text: '登录成功', icon: 'success' })
     localStorage.setItem("access_token", response.data.access_token)
     router.push('/dashboard')
   }
