@@ -113,22 +113,23 @@ function isEmailFormatWrong(): boolean {
 </script>
 
 <template>
-  <div class="bg-white p-8 rounded-lg shadow-md max-w-md mx-auto mt-10">
-    <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">{{ props.register ? '注册' : '登录' }}</h2>
+  <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md max-w-md mx-auto mt-10">
+    <h2 class="text-2xl font-bold text-center text-gray-700 dark:text-gray-200 mb-6">{{ props.register ? '注册' : '登录' }}
+    </h2>
 
     <!-- 邮箱输入框 -->
     <div class="mb-4">
       <input v-model="email" type="email" placeholder="邮箱" :disabled="sendingCode"
-        class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
 
       <div v-if="restrictEmailDomain === 'whitelist'"
-        class="mt-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-md">
+        class="mt-2 text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-2 rounded-md">
         <i class="i-tabler-info-circle mr-1"></i>
         仅允许以下域名的邮箱：{{ (restrictedEmailDomains as Array<string>).join("、") }}
       </div>
 
       <div v-if="restrictEmailDomain === 'blacklist'"
-        class="mt-2 text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-md">
+        class="mt-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-md">
         <i class="i-tabler-alert-triangle mr-1"></i>
         不允许以下域名的邮箱：{{ (restrictedEmailDomains as Array<string>).join("、") }}
       </div>
@@ -137,10 +138,10 @@ function isEmailFormatWrong(): boolean {
     <!-- 验证码输入框 + 发送按钮 -->
     <div class="mb-4 flex items-center space-x-2">
       <input v-model="code" type="text" placeholder="验证码"
-        class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
       <button @click="sendCode" :disabled="countingDown || sendingCode" :class="{
-        'bg-gray-400 cursor-not-allowed': countingDown || sendingCode || validateEmail().length !== 0,
-        'bg-blue-500 hover:bg-blue-600': !(countingDown || sendingCode || validateEmail().length !== 0)
+        'bg-gray-400 cursor-not-allowed dark:bg-gray-600 dark:cursor-not-allowed': countingDown || sendingCode || validateEmail().length !== 0,
+        'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700': !(countingDown || sendingCode || validateEmail().length !== 0)
       }" class="px-4 py-2 text-white rounded-md transition-colors">
         {{ countingDown ? `${countdown}s` : '发送验证码' }}
       </button>
@@ -149,24 +150,26 @@ function isEmailFormatWrong(): boolean {
     <!-- 记住我 -->
     <div class="flex items-center mb-6" v-if="!props.register">
       <input id="remember" v-model="rememberMe" type="checkbox"
-        class="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500" />
-      <label for="remember" class="text-sm text-gray-700">记住我</label>
+        class="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:checked:bg-blue-600 dark:checked:border-blue-600" />
+      <label for="remember" class="text-sm text-gray-700 dark:text-gray-300">记住我</label>
     </div>
 
     <!-- 登录按钮 -->
     <button @click="loginOrRegister"
-      class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition-colors">
+      class="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors">
       {{ props.register ? '注册' : '登录' }}
     </button>
 
     <!-- 注册/登录链接 -->
-    <div class="mt-6 text-center text-sm text-gray-600" v-if="!register">
+    <div class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400" v-if="!register">
       还没有账户？
-      <router-link to="/register" class="text-blue-500 hover:underline">立即注册</router-link>
+      <router-link to="/register"
+        class="text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300">立即注册</router-link>
     </div>
-    <div class="mt-6 text-center text-sm text-gray-600" v-if="register">
+    <div class="mt-6 text-center text-sm text-gray-600 dark:text-gray-400" v-if="register">
       已有账户？
-      <router-link to="/login" class="text-blue-500 hover:underline">立即登录</router-link>
+      <router-link to="/login"
+        class="text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300">立即登录</router-link>
     </div>
   </div>
 </template>
