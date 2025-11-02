@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref, type Ref, inject } from 'vue';
 import { api } from '@/main';
 import type { EmailDomainRestrictionInfoRestrictEmailDomainsEnum } from '@/../sdk';
 import { checkAndDealError } from '@/lib';
@@ -19,6 +19,7 @@ const email = ref("")
 const restrictEmailDomain = ref<EmailDomainRestrictionInfoRestrictEmailDomainsEnum | undefined>(undefined)
 const restrictedEmailDomains = ref<Array<string> | undefined>(undefined)
 const registeringOrLoggingIn = ref(false)
+const logged_in: Ref<boolean, boolean> = inject('logged_in') as Ref<boolean, boolean>
 
 let timer: number | undefined = undefined
 
@@ -78,6 +79,7 @@ async function loginOrRegister() {
     if (checkAndDealError(response)) return
     Swal.fire({ title: '成功', text: '登录成功', icon: 'success' })
     localStorage.setItem("access_token", response.data.access_token)
+    logged_in.value = true
     router.push('/dashboard')
   }
 }
